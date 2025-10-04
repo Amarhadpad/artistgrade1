@@ -169,36 +169,105 @@
 
 
   <!-- Best Sellers / Top Brands -->
-  <section class="best-sellers">
-    <h2 class="section-title">BEST SELLERS</h2>
-    <div class="product-grid">
-      <div class="product-card">
-        <img src="/public/images/box1.jpg" alt="Artwork 1">
-        <h3>Color Boxes</h3>
-        <p>€80.00</p>
-        <button class="btn">Add to Cart</button>
+<section class="best-sellers py-5">
+  <div class="container">
+    <h2 class="section-title text-center mb-4">BEST SELLERS</h2>
+
+    <div id="bestSellersCarousel" class="carousel slide" data-bs-ride="carousel">
+      <div class="carousel-inner">
+
+        <!-- Slide 1 -->
+        <div class="carousel-item active">
+          <div class="row g-3">
+            <!-- Mobile: 1 per row, Desktop: 4 per row -->
+            <div class="col-12 col-lg-3">
+              <div class="product-card text-center">
+                <img src="/public/images/box1.jpg" class="d-block w-100" alt="Artwork 1">
+                <h3>Color Boxes</h3>
+                <p>€80.00</p>
+                <button class="btn btn-dark">Add to Cart</button>
+              </div>
+            </div>
+            <div class="col-12 col-lg-3">
+              <div class="product-card text-center">
+                <img src="/public/images/table.jpg" class="d-block w-100" alt="Artwork 2">
+                <h3>MDrawing</h3>
+                <p>€65.00</p>
+                <button class="btn btn-dark">Add to Cart</button>
+              </div>
+            </div>
+            <div class="col-12 col-lg-3">
+              <div class="product-card text-center">
+                <img src="/public/images/pallete.jpg" class="d-block w-100" alt="Artwork 3">
+                <h3>Palletes</h3>
+                <p>€120.00</p>
+                <button class="btn btn-dark">Add to Cart</button>
+              </div>
+            </div>
+            <div class="col-12 col-lg-3">
+              <div class="product-card text-center">
+                <img src="/public/images/frames.jpg" class="d-block w-100" alt="Artwork 4">
+                <h3>Painting</h3>
+                <p>€95.00</p>
+                <button class="btn btn-dark">Add to Cart</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Slide 2 -->
+        <div class="carousel-item">
+          <div class="row g-3">
+            <div class="col-12 col-lg-3">
+              <div class="product-card text-center">
+                <img src="/public/images/brush.jpg" class="d-block w-100" alt="Artwork 5">
+                <h3>Brush Set</h3>
+                <p>€50.00</p>
+                <button class="btn btn-dark">Add to Cart</button>
+              </div>
+            </div>
+            <div class="col-12 col-lg-3">
+              <div class="product-card text-center">
+                <img src="/public/images/canvas.jpg" class="d-block w-100" alt="Artwork 6">
+                <h3>Canvas</h3>
+                <p>€75.00</p>
+                <button class="btn btn-dark">Add to Cart</button>
+              </div>
+            </div>
+            <div class="col-12 col-lg-3">
+              <div class="product-card text-center">
+                <img src="/public/images/pencils.jpg" class="d-block w-100" alt="Artwork 7">
+                <h3>Pencil Set</h3>
+                <p>€30.00</p>
+                <button class="btn btn-dark">Add to Cart</button>
+              </div>
+            </div>
+            <div class="col-12 col-lg-3">
+              <div class="product-card text-center">
+                <img src="/public/images/easel.jpg" class="d-block w-100" alt="Artwork 8">
+                <h3>Easel</h3>
+                <p>€90.00</p>
+                <button class="btn btn-dark">Add to Cart</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
       </div>
-      <div class="product-card">
-        <img src="/public/images/table.jpg" alt="Artwork 2">
-        <h3>MDrawing</h3>
-        <p>€65.00</p>
-        <button class="btn">Add to Cart</button>
-      </div>
-      <div class="product-card">
-        <img src="/public/images/pallete.jpg" alt="Artwork 3">
-        <h3>palletes</h3>
-        <p>€120.00</p>
-        <button class="btn">Add to Cart</button>
-      </div>
-      <div class="product-card">
-        <img src="/public/images/frames.jpg" alt="Artwork 4">
-        <h3>Painting</h3>
-        <p>€95.00</p>
-        <button class="btn">Add to Cart</button>
-      </div>
+
+      <!-- Carousel Controls -->
+      <button class="carousel-control-prev" type="button" data-bs-target="#bestSellersCarousel" data-bs-slide="prev">
+        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+        <span class="visually-hidden">Previous</span>
+      </button>
+      <button class="carousel-control-next" type="button" data-bs-target="#bestSellersCarousel" data-bs-slide="next">
+        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+        <span class="visually-hidden">Next</span>
+      </button>
     </div>
-  </section>
-  
+  </div>
+</section>
+
   <!-- Features Section -->
 <section class="features-section py-5">
   <div class="container text-center">
