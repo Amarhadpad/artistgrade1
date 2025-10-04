@@ -38,18 +38,21 @@
 </head>
 <body>
 
-<!-- Fixed Navbar -->
+<!-- header.html -->
 <div class="fixed-header">
+  <!-- Top Bar -->
   <div class="top-bar bg-light py-2 border-bottom">
     <div class="container">
       <div class="row align-items-center text-center text-md-start">
         <div class="col-12 col-md-6 mb-2 mb-md-0">
           <div class="left-text small">
-            Welcome visitor, you can <a href="/login">Log in</a> or <a href="/register">Create an Account</a>
+            Welcome visitor, you can 
+            <a href="/login">Log in</a> or 
+            <a href="/register">Create an Account</a>
           </div>
         </div>
         <div class="col-12 col-md-6 d-flex justify-content-center justify-content-md-end flex-wrap align-items-center gap-3">
-          <span class="small">Call us: <strong>(123) 456-7890</strong></span>
+          <span class="small">Call us: <strong>+91 9921041736</strong></span>
           <a href="#">Orders</a>
           <a href="#" class="cart-icon"><i class="fa fa-shopping-cart"></i></a>
         </div>
@@ -57,6 +60,7 @@
     </div>
   </div>
 
+  <!-- Navbar -->
   <nav class="navbar navbar-expand-lg main-nav">
     <div class="container">
       <a class="navbar-brand" href="/">ArtistGrade</a>
@@ -65,10 +69,10 @@
       </button>
       <div class="collapse navbar-collapse" id="navbarNav">
         <ul class="navbar-nav ms-auto">
-          <li class="nav-item"><a class="nav-link" href="/">Home</a></li>
+          <li class="nav-item"><a class="nav-link active" href="/">Home</a></li>
           <li class="nav-item"><a class="nav-link" href="/shop">Shop</a></li>
-          <li class="nav-item"><a class="nav-link active" href="/contactus">Contact</a></li>
-          <li class="nav-item"><a class="nav-link" href="#"><i class="fa fa-search"></i></a></li>
+          <li class="nav-item"><a class="nav-link" href="/contactus">About</a></li>
+          <li class="nav-item"><a class="nav-link" href="/contactus">Contact</a></li>
         </ul>
       </div>
     </div>
@@ -162,42 +166,51 @@
 </section>
 
 <!-- Footer -->
-<footer class="site-footer">
-  <div class="container">
-    <div class="row mb-4">
-      <div class="col-md-3">
-        <h6>Customer Care</h6>
-        <ul class="list-unstyled">
-          <li><a href="#">Contact Us</a></li>
-          <li><a href="#">Call: 800 227 8437</a></li>
-          <li><a href="#">FAQ</a></li>
-          <li><a href="#">Track Your Order</a></li>
-        </ul>
+<footer class="artist-footer">
+  <div class="footer-container">
+    <!-- Brand Section -->
+    <div class="footer-section footer-brand">
+      <h2 class="footer-logo">🎨 ArtistGrade</h2>
+      <p class="footer-tagline">Your one-stop store for premium art supplies & creative tools.</p>
+
+      <div class="footer-social">
+        <a href="#"><i class="fab fa-facebook-f"></i></a>
+        <a href="#"><i class="fab fa-instagram"></i></a>
+        <a href="#"><i class="fab fa-twitter"></i></a>
+        <a href="#"><i class="fab fa-youtube"></i></a>
       </div>
-      <div class="col-md-3">
-        <h6>Our Company</h6>
-        <ul class="list-unstyled">
-          <li><a href="#">Find a Boutique</a></li>
-          <li><a href="#">Careers</a></li>
-          <li><a href="#">Corporate Responsibility</a></li>
-        </ul>
-      </div>
-      <div class="col-md-3">
-        <h6>Legal</h6>
-        <ul class="list-unstyled">
-          <li><a href="#">Terms of Use</a></li>
-          <li><a href="#">Privacy Policy</a></li>
-        </ul>
-      </div>
-      <div class="col-md-3 social">
-        <h6>Follow Us</h6>
-        <a href="#"><i class="bi bi-instagram"></i></a>
-        <a href="#"><i class="bi bi-facebook"></i></a>
-        <a href="#"><i class="bi bi-twitter"></i></a>
-      </div>
+
+      <a href="https://wa.me/919876543210" target="_blank" class="whatsapp-btn">
+        <i class="fab fa-whatsapp"></i> Chat on WhatsApp
+      </a>
     </div>
-    <hr>
-    <p class="text-center mb-0">© 2025 ArtistGrade | All Rights Reserved</p>
+
+    <!-- Quick Links -->
+    <div class="footer-section">
+      <h4>Quick Links</h4>
+      <ul>
+        <li><a href="/">Home</a></li>
+        <li><a href="/shop">Shop</a></li>
+        <li><a href="/about">About Us</a></li>
+        <li><a href="/contactus">Contact Us</a></li>
+        <li><a href="/faq.html">FAQ</a></li>
+      </ul>
+    </div>
+
+    <!-- Support Links -->
+    <div class="footer-section">
+      <h4>Support</h4>
+      <ul>
+        <li><a href="#">Customer Support</a></li>
+        <li><a href="#">Returns & Refunds</a></li>
+        <li><a href="/Documents/ArtistGrade_Privacy_Policy.pdf">Privacy Policy</a></li>
+        <li><a href="#">Terms & Conditions</a></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="footer-bottom">
+    <p>© 2025 ArtistGrade Inc. All rights reserved.</p>
   </div>
 </footer>
 

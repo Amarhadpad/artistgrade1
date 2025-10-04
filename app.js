@@ -31,7 +31,15 @@ app.get("/shop1", (req, res) => {
   res.sendFile(path.join(__dirname, "views/pages/collection.html"));
 });
 
-
+app.get("/privacy", (req, res) => {
+  const filePath = path.join(__dirname, "Documents", "ArtistGrade_Privacy_Policy.pdf");
+  res.download(filePath, "ArtistGrade_Privacy_Policy.pdf", (err) => {
+    if (err) {
+      console.error("Error sending the file:", err);
+      res.status(500).send("Could not download the file.");
+    }
+  });
+});
 app.get("/product_details", (req, res) => {
   res.sendFile(path.join(__dirname, "views/pages/product_details.html"));
 });
