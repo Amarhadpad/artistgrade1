@@ -69,10 +69,10 @@
       </button>
       <div class="collapse navbar-collapse" id="navbarNav">
         <ul class="navbar-nav ms-auto">
-          <li class="nav-item"><a class="nav-link active" href="/">Home</a></li>
+          <li class="nav-item"><a class="nav-link" href="/">Home</a></li>
           <li class="nav-item"><a class="nav-link" href="/shop">Shop</a></li>
-          <li class="nav-item"><a class="nav-link" href="/contactus">About</a></li>
-          <li class="nav-item"><a class="nav-link" href="/contactus">Contact</a></li>
+          <li class="nav-item"><a class="nav-link" href="/about">About</a></li>
+          <li class="nav-item"><a class="nav-link active" href="/contactus">Contact</a></li>
         </ul>
       </div>
     </div>
@@ -219,7 +219,19 @@
 <script>
   document.getElementById('customProductForm').addEventListener('submit', async function(e){
     e.preventDefault();
-    const data = Object.fromEntries(new FormData(this).entries());
+
+    const form = this;
+    const submitBtn = form.querySelector('button[type="submit"]');
+    const originalBtnHTML = submitBtn.innerHTML;
+
+    // Prepare data
+    const data = Object.fromEntries(new FormData(form).entries());
+
+    // Show spinner and disable button
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = `
+      <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Submitting...
+    `;
 
     try {
       const res = await fetch("/submit-request", {
@@ -227,12 +239,31 @@
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data)
       });
+
       const result = await res.json();
-      alert(result.message);
-      this.reset();
+
+      // Show success message
+      const successMsg = document.createElement("div");
+      successMsg.className = "alert alert-success mt-3";
+      successMsg.textContent = result.message || "Request submitted successfully!";
+      form.appendChild(successMsg);
+
+      // Clear form
+      form.reset();
+
+      // Auto-remove message after 5s
+      setTimeout(() => successMsg.remove(), 5000);
     } catch (err) {
       console.error(err);
-      alert("Failed to submit request. Please try again.");
+      const errorMsg = document.createElement("div");
+      errorMsg.className = "alert alert-danger mt-3";
+      errorMsg.textContent = "Failed to submit request. Please try again.";
+      form.appendChild(errorMsg);
+      setTimeout(() => errorMsg.remove(), 5000);
+    } finally {
+      // Restore button
+      submitBtn.disabled = false;
+      submitBtn.innerHTML = originalBtnHTML;
     }
   });
 </script>
