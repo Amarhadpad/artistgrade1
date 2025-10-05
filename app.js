@@ -8,6 +8,7 @@ const PORT = 3000;
 app.use("/public", express.static(path.join(__dirname, "public")));
 
 // Routes to render your HTML pages
+
 app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "views/pages/index.html"));
 });

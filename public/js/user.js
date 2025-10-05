@@ -1,55 +1,58 @@
-// public/js/users.js
+// js/users.js
 
-document.addEventListener("DOMContentLoaded", async () => {
-  const tbody = document.getElementById("userTableBody");
+document.addEventListener("DOMContentLoaded", fetchUsers);
 
+async function fetchUsers() {
   try {
-    const res = await fetch("/api/users");  // API endpoint to get all users
+    const res = await fetch("/api/users");
+    if (!res.ok) throw new Error("Failed to fetch users");
+    
     const users = await res.json();
+    const tbody = document.getElementById("userTableBody");
+    tbody.innerHTML = ""; // Clear previous content
 
-    if (users.length === 0) {
-      tbody.innerHTML = `<tr><td colspan="7" class="text-center">No users found</td></tr>`;
-      return;
-    }
+    users.forEach(user => {
+      const tr = document.createElement("tr");
 
-    tbody.innerHTML = users.map(user => {
-      return `
-        <tr>
-          <td>${user._id}</td>
-          <td>${user.fullname}</td>
-          <td>${user.email}</td>
-          <td>${new Date(user.createdAt).toLocaleDateString()}</td>
-          <td>${user.role || 'User'}</td>
-          <td>${user.isActive ? 'Active' : 'Inactive'}</td>
-          <td>
-            <button class="btn btn-sm btn-primary" onclick="editUser('${user._id}')">Edit</button>
-            <button class="btn btn-sm btn-danger" onclick="deleteUser('${user._id}')">Delete</button>
-          </td>
-        </tr>
+      tr.innerHTML = `
+        <td>${user._id}</td>
+        <td>${escapeHtml(user.fullname)}</td>
+        <td>${escapeHtml(user.email)}</td>
+        <td>${new Date(user.createdAt).toLocaleDateString()}</td>
+        <td>${user.role || 'User'}</td>
+        <td>${user.isActive === false ? '<span class="text-danger">Inactive</span>' : '<span class="text-success">Active</span>'}</td>
+        <td>
+          <button class="btn btn-sm btn-danger" onclick="deleteUser('${user._id}')">Delete</button>
+        </td>
       `;
-    }).join("");
-  } catch (err) {
-    console.error("Error fetching users:", err);
-    tbody.innerHTML = `<tr><td colspan="7" class="text-center text-danger">Failed to load users</td></tr>`;
-  }
-});
+      tbody.appendChild(tr);
+    });
 
-// Function to delete a user
-async function deleteUser(userId) {
-  if (!confirm("Are you sure you want to delete this user?")) return;
-
-  try {
-    const res = await fetch(`/api/users/${userId}`, { method: "DELETE" });
-    const result = await res.json();
-    alert(result.message);
-    if (res.ok) location.reload();
   } catch (err) {
-    console.error("Error deleting user:", err);
-    alert("Failed to delete user");
+    console.error(err);
+    alert("Error fetching users");
   }
 }
 
-// Placeholder for edit functionality
-function editUser(userId) {
-  alert("Edit functionality coming soon for user: " + userId);
+// Delete user
+async function deleteUser(id) {
+  if (!confirm("Are you sure you want to delete this user?")) return;
+
+  try {
+    const res = await fetch(`/api/users/${id}`, { method: "DELETE" });
+    if (!res.ok) throw new Error("Failed to delete user");
+    alert("User deleted successfully");
+    fetchUsers(); // Refresh the table
+  } catch (err) {
+    console.error(err);
+    alert("Error deleting user");
+  }
+}
+
+// Simple HTML escape
+function escapeHtml(str) {
+  if (!str) return '';
+  return str.replace(/[&<>"'`=\/]/g, s => ({
+    '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;', '/':'&#x2F;', '`':'&#x60;', '=':'&#x3D;'
+  }[s]));
 }

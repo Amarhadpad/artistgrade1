@@ -32,8 +32,8 @@
     .product-info .old-price { text-decoration:line-through; color:#999; font-size:0.85rem; }
     .stock-info { font-size:0.8rem; color:#888; margin-top:5px; }
 
-    /* Cart Drawer */
-    #cartDrawer {
+    /* Cart Sidebar */
+    .cart-sidebar {
       position: fixed;
       top: 0;
       right: -360px;
@@ -47,94 +47,88 @@
       display: flex;
       flex-direction: column;
     }
-    #cartDrawer.open { right: 0; }
-    #cartDrawer .cart-header {
+    .cart-sidebar.open { right: 0; }
+    .cart-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
       padding: 16px;
       border-bottom: 1px solid #e9e9e9;
     }
-    #cartDrawer .cart-body {
-      flex: 1;
-      overflow-y: auto;
-      padding: 14px;
-    }
-    #cartDrawer .cart-item {
-      display: flex;
-      justify-content: space-between;
-      gap: 12px;
-      align-items: center;
-      padding: 10px 0;
-      border-bottom: 1px solid #f1f1f1;
-    }
-
-    .cart-badge {
-      background:#ff6f61;
-      color:white;
-      font-size:12px;
-      border-radius:50%;
-      padding:3px 8px;
-      position:absolute;
-      top:-8px;
-      right:-10px;
-      display:inline-block;
-      font-weight:700;
-    }
+    .cart-body { flex: 1; overflow-y: auto; padding: 14px; }
+    .cart-item { display: flex; justify-content: space-between; gap: 12px; align-items: center; padding: 10px 0; border-bottom: 1px solid #f1f1f1; }
+    .cart-footer { padding: 14px; border-top: 1px solid #e9e9e9; }
 
     /* Overlay */
-    #cartOverlay {
+    .cart-overlay {
       position: fixed;
       inset: 0;
       background: rgba(0,0,0,0.45);
       display: none;
       z-index: 1900;
     }
-    #cartOverlay.active { display: block; }
+    .cart-overlay.active { display: block; }
 
-    @media(max-width:480px){ #cartDrawer{ width:92%; } }
+    /* Cart count badge */
+    .cart-icon { position: relative; display: inline-block; cursor:pointer; }
+    .cart-count {
+      display: none;
+      position: absolute;
+      top: -8px;
+      right: -10px;
+      background: #e63946;
+      color: #fff;
+      font-size: 12px;
+      font-weight: 700;
+      padding: 2px 6px;
+      border-radius: 999px;
+      line-height: 1;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+    }
+    .cart-count.show { display: inline-block; }
+
+    @media (max-width: 480px){ .cart-sidebar { width: 92%; } }
   </style>
 </head>
 <body class="shop-page">
 
-<!-- header -->
-<div class="fixed-header">
-  <div class="top-bar bg-light py-2 border-bottom">
-    <div class="container">
-      <div class="row align-items-center text-center text-md-start">
-        <div class="col-12 col-md-6 mb-2 mb-md-0">
-          <div class="left-text small">
-            Welcome visitor, you can <a href="/login">Log in</a> or <a href="/register">Create an Account</a>
-          </div>
+<!-- Top Bar -->
+<div class="top-bar bg-light py-2 border-bottom">
+  <div class="container">
+    <div class="row align-items-center text-center text-md-start">
+      <div class="col-12 col-md-6 mb-2 mb-md-0">
+        <div class="left-text small" id="topBarUser">
+          Welcome visitor, you can 
+          <a href="/login">Log in</a> or 
+          <a href="/register">Create an Account</a>
         </div>
-        <div class="col-12 col-md-6 d-flex justify-content-center justify-content-md-end flex-wrap align-items-center gap-3">
-          <span class="small">Call us: <strong>+91 9921041736</strong></span>
-          <a href="#" class="cart-icon position-relative" onclick="toggleCart()">
-            <i class="fa fa-shopping-cart"></i>
-            <span id="cartCount" class="cart-badge"></span>
-          </a>
-        </div>
+      </div>
+      <div class="col-12 col-md-6 d-flex justify-content-center justify-content-md-end flex-wrap align-items-center gap-3">
+        <span class="small">Call us: <strong>+91 9921041736</strong></span>
+        <a href="#">Orders</a>
+        <a class="cart-icon"><i class="fa fa-shopping-cart"></i><span id="cartCount" class="cart-count">0</span></a>
       </div>
     </div>
   </div>
-
-  <nav class="navbar navbar-expand-lg main-nav">
-    <div class="container">
-      <a class="navbar-brand" href="/">ArtistGrade</a>
-      <button class="navbar-toggler text-white" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-        <span class="navbar-toggler-icon"><i class="fa fa-bars text-white"></i></span>
-      </button>
-      <div class="collapse navbar-collapse" id="navbarNav">
-        <ul class="navbar-nav ms-auto">
-          <li class="nav-item"><a class="nav-link" href="/">Home</a></li>
-          <li class="nav-item"><a class="nav-link active" href="/shop">Shop</a></li>
-          <li class="nav-item"><a class="nav-link" href="/about">About</a></li>
-          <li class="nav-item"><a class="nav-link" href="/contactus">Contact</a></li>
-        </ul>
-      </div>
-    </div>
-  </nav>
 </div>
+
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg main-nav">
+  <div class="container">
+    <a class="navbar-brand" href="/">ArtistGrade</a>
+    <button class="navbar-toggler text-white" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+      <span class="navbar-toggler-icon"><i class="fa fa-bars text-white"></i></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav ms-auto">
+        <li class="nav-item"><a class="nav-link" href="/">Home</a></li>
+        <li class="nav-item"><a class="nav-link active" href="/shop">Shop</a></li>
+        <li class="nav-item"><a class="nav-link" href="/about">About</a></li>
+        <li class="nav-item"><a class="nav-link" href="/contactus">Contact</a></li>
+      </ul>
+    </div>
+  </div>
+</nav>
 
 <!-- Shop Products -->
 <div class="container py-5">
@@ -143,48 +137,40 @@
 </div>
 
 <!-- Cart Sidebar -->
-<div id="cartDrawer">
+<div id="cartSidebar" class="cart-sidebar">
   <div class="cart-header">
     <h5>Your Cart</h5>
-    <button class="btn-close" onclick="toggleCart()"></button>
+    <button class="btn-close" onclick="toggleCartSidebar()"></button>
   </div>
   <div class="cart-body" id="cartItems">
     <p class="text-muted">Your cart is empty</p>
   </div>
-  <div class="cart-footer p-3">
+  <div class="cart-footer">
     <h5>Total: ₹<span id="cartTotal">0</span></h5>
     <button class="btn btn-success w-100 mb-2" onclick="checkout()">Checkout</button>
-    <button class="btn btn-secondary w-100" onclick="toggleCart()">Close</button>
+    <button class="btn btn-secondary w-100" onclick="toggleCartSidebar()">Close</button>
   </div>
 </div>
+<div id="cartOverlay" class="cart-overlay" onclick="toggleCartSidebar()"></div>
 
-<!-- Overlay -->
-<div id="cartOverlay" onclick="toggleCart()"></div>
-
-   <!-- Footer -->
- <footer class="artist-footer">
+<!-- Footer -->
+<footer class="artist-footer">
   <div class="footer-container">
-    <!-- Brand Section -->
     <div class="footer-section footer-brand">
       <h2 class="footer-logo">🎨 ArtistGrade</h2>
       <p class="footer-tagline">Your one-stop store for premium art supplies & creative tools.</p>
-
       <div class="footer-social">
         <a href="#"><i class="fab fa-facebook-f"></i></a>
         <a href="#"><i class="fab fa-instagram"></i></a>
         <a href="#"><i class="fab fa-twitter"></i></a>
         <a href="#"><i class="fab fa-youtube"></i></a>
       </div>
-
-   <a href="https://wa.me/919137534732?text=Hello%20ArtistGrade%2C%20I%20saw%20your%20website%20and%20want%20to%20know%20more%20about%20your%20products."
-   target="_blank" 
-   class="whatsapp-btn">
-  <i class="fab fa-whatsapp"></i> Chat on WhatsApp
-</a>
-
+      <a href="https://wa.me/919137534732?text=Hello%20ArtistGrade%2C%20I%20saw%20your%20website%20and%20want%20to%20know%20more%20about%20your%20products."
+         target="_blank" class="whatsapp-btn">
+        <i class="fab fa-whatsapp"></i> Chat on WhatsApp
+      </a>
     </div>
 
-    <!-- Quick Links -->
     <div class="footer-section">
       <h4>Quick Links</h4>
       <ul>
@@ -196,7 +182,6 @@
       </ul>
     </div>
 
-    <!-- Support Links -->
     <div class="footer-section">
       <h4>Support</h4>
       <ul>
@@ -212,17 +197,16 @@
     <p>© 2025 ArtistGrade Inc. All rights reserved.</p>
   </div>
 </footer>
+
 <!-- Scripts -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-  const API = '/api/products';
   let cart = JSON.parse(localStorage.getItem('cart')) || [];
   let productsData = [];
 
-  // Fetch products dynamically
   async function fetchProducts(){
     try{
-      const res = await fetch(API);
+      const res = await fetch('/api/products');
       if(!res.ok) throw new Error('Failed to fetch products');
       productsData = await res.json();
       const container = document.getElementById("productContainer");
@@ -233,7 +217,7 @@
         card.innerHTML = `
           <div class="product-card">
             <img src="${p.image}" alt="${escapeHtml(p.name)}">
-            <div class="product-info">
+            <div class="p-3">
               <p>${escapeHtml(p.category)}</p>
               <h6>${escapeHtml(p.name)}</h6>
               <div><span class="price">₹${p.price}</span></div>
@@ -243,10 +227,9 @@
         container.appendChild(card);
       });
       updateCartUI();
-    }catch(err){ console.error(err); }
+    } catch(err) { console.error(err); }
   }
 
-  // Cart functions
   function addToCart(id){
     const product = productsData.find(p=>p._id===id);
     if(!product) return;
@@ -255,15 +238,14 @@
     else cart.push({...product, qty:1});
     saveCart();
     updateCartUI();
-    document.getElementById('cartDrawer').classList.add('open');
-    document.getElementById('cartOverlay').classList.add('active');
+    openCartSidebar();
   }
 
   function decreaseQty(id){
     const item = cart.find(i=>i._id===id);
     if(!item) return;
-    item.qty-=1;
-    if(item.qty<=0) cart = cart.filter(i=>i._id!==id);
+    item.qty -= 1;
+    if(item.qty <= 0) cart = cart.filter(i=>i._id!==id);
     saveCart();
     updateCartUI();
   }
@@ -277,19 +259,22 @@
   function saveCart(){ localStorage.setItem('cart', JSON.stringify(cart)); }
 
   function updateCartUI(){
-    document.getElementById('cartCount').innerText = cart.reduce((sum,i)=>sum+i.qty,0);
+    const cartCountEl = document.getElementById('cartCount');
     const cartItemsEl = document.getElementById('cartItems');
     const cartTotalEl = document.getElementById('cartTotal');
-    cartItemsEl.innerHTML='';
-    let total=0;
-    if(cart.length===0){
-      cartItemsEl.innerHTML='<p class="text-muted">Your cart is empty</p>';
+
+    let total = 0;
+    cartItemsEl.innerHTML = '';
+
+    if(cart.length === 0){
+      cartItemsEl.innerHTML = '<p class="text-muted">Your cart is empty</p>';
+      if(cartCountEl) cartCountEl.classList.remove('show');
     } else {
-      cart.forEach(item=>{
-        total+=item.price*item.qty;
+      cart.forEach(item => {
+        total += item.price * item.qty;
         const div = document.createElement('div');
-        div.className='cart-item d-flex justify-content-between align-items-center mb-2';
-        div.innerHTML=`
+        div.className = 'cart-item d-flex justify-content-between align-items-center mb-2';
+        div.innerHTML = `
           <div class="d-flex align-items-center gap-2">
             <img src="${item.image}" style="width:50px;height:50px;object-fit:cover;" class="rounded">
             <div>
@@ -308,15 +293,21 @@
           </div>`;
         cartItemsEl.appendChild(div);
       });
+      if(cartCountEl) cartCountEl.classList.add('show');
     }
-    cartTotalEl.innerText=total;
+
+    cartTotalEl.innerText = total;
+    if(cartCountEl) cartCountEl.innerText = cart.reduce((sum,i)=>sum+i.qty,0);
   }
 
-  function toggleCart(){
-    const drawer=document.getElementById('cartDrawer');
-    const overlay=document.getElementById('cartOverlay');
-    drawer.classList.toggle('open');
-    overlay.classList.toggle('active');
+  function toggleCartSidebar(){
+    document.getElementById('cartSidebar').classList.toggle('open');
+    document.getElementById('cartOverlay').classList.toggle('active');
+  }
+
+  function openCartSidebar(){
+    document.getElementById('cartSidebar').classList.add('open');
+    document.getElementById('cartOverlay').classList.add('active');
   }
 
   function checkout(){
@@ -330,6 +321,19 @@
   }
 
   document.addEventListener("DOMContentLoaded", fetchProducts);
+
+  async function updateTopBar() {
+    try {
+      const res = await fetch('/api/current_user');
+      const user = await res.json();
+      const topBar = document.getElementById('topBarUser');
+      if (user && user.name) {
+        topBar.innerHTML = `Welcome, <strong>${user.name}</strong> | <a href="/logout">Log out</a>`;
+      }
+    } catch (err) { console.error('Error fetching user:', err); }
+  }
+  updateTopBar();
 </script>
+
 </body>
 </html>

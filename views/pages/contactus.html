@@ -14,6 +14,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
 
   <link rel="stylesheet" href="/public/css/nav.css">
+  <link rel="stylesheet" href="/public/js/bar.js">
 
   <style>
     body { font-family: 'Poppins', sans-serif; background:#f9f9f9; margin:0; margin-top:110px; }
@@ -41,24 +42,24 @@
 <!-- header.html -->
 <div class="fixed-header">
   <!-- Top Bar -->
-  <div class="top-bar bg-light py-2 border-bottom">
-    <div class="container">
-      <div class="row align-items-center text-center text-md-start">
-        <div class="col-12 col-md-6 mb-2 mb-md-0">
-          <div class="left-text small">
-            Welcome visitor, you can 
-            <a href="/login">Log in</a> or 
-            <a href="/register">Create an Account</a>
-          </div>
+<div class="top-bar bg-light py-2 border-bottom">
+  <div class="container">
+    <div class="row align-items-center text-center text-md-start">
+      <div class="col-12 col-md-6 mb-2 mb-md-0">
+        <div class="left-text small" id="topBarUser">
+          Welcome visitor, you can 
+          <a href="/login">Log in</a> or 
+          <a href="/register">Create an Account</a>
         </div>
-        <div class="col-12 col-md-6 d-flex justify-content-center justify-content-md-end flex-wrap align-items-center gap-3">
-          <span class="small">Call us: <strong>+91 9921041736</strong></span>
-          <a href="#">Orders</a>
-          <a href="#" class="cart-icon"><i class="fa fa-shopping-cart"></i></a>
-        </div>
+      </div>
+      <div class="col-12 col-md-6 d-flex justify-content-center justify-content-md-end flex-wrap align-items-center gap-3">
+        <span class="small">Call us: <strong>+91 9921041736</strong></span>
+        <a href="#">Orders</a>
+        <a href="#" class="cart-icon"><i class="fa fa-shopping-cart"></i></a>
       </div>
     </div>
   </div>
+</div>
 
   <!-- Navbar -->
   <nav class="navbar navbar-expand-lg main-nav">
@@ -267,6 +268,29 @@
     }
   });
 </script>
+<script>
+    async function updateTopBar() {
+      try {
+        const res = await fetch('/api/current_user');
+        const user = await res.json();
+
+        const topBar = document.getElementById('topBarUser');
+        if (user) {
+          topBar.innerHTML = `Welcome, <strong>${user.name}</strong> | <a href="/logout">Log out</a>`;
+        } else {
+          topBar.innerHTML = `Welcome visitor, you can 
+            <a href="/login">Log in</a> or 
+            <a href="/register">Create an Account</a>`;
+        }
+      } catch (err) {
+        console.error('Error fetching user:', err);
+      }
+    }
+
+    // Call it on page load
+    updateTopBar();
+</script>
+
 
 </body>
 </html>

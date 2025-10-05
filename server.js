@@ -182,18 +182,6 @@ app.delete('/api/products/:id', async (req, res) => {
   }
 });
 
-// ---------------------
-// MOCK PRODUCTS API
-// ---------------------
-app.get("/api/mock-products", (req, res) => {
-  const products = [
-    { id: 1, title: "Abstract Sunrise", category: "Painting", style: "Abstract", price: 1200, stock: true, image: "https://via.placeholder.com/250" },
-    { id: 2, title: "Modern Sculpture", category: "Sculpture", style: "Contemporary", price: 2500, stock: true, image: "https://via.placeholder.com/250" },
-    { id: 3, title: "City Photography", category: "Photography", style: "Minimalist", price: 800, stock: false, image: "https://via.placeholder.com/250" },
-    { id: 4, title: "Digital Landscape", category: "Digital", style: "Landscape", price: 1500, stock: true, image: "https://via.placeholder.com/250" }
-  ];
-  res.json(products);
-});
 
 // ---------------------
 // Sessions + Passport
@@ -259,6 +247,47 @@ app.get("/logout", (req, res, next) => {
     res.redirect("/");
   });
 });
+
+//login user
+app.get('/api/current_user', (req, res) => {
+  if (req.session.userId) {
+    return res.json({ name: req.session.fullname}); // or store user name in session
+  }
+  res.json(null);
+});
+
+app.post('/login', async (req, res) => {
+  try {
+    const { email, password } = req.body;
+    if (!email || !password) {
+      return res.status(400).send("Email and password are required");
+    }
+
+    // Find user
+    const user = await UserReg.findOne({ email });
+    if (!user) {
+      return res.status(401).send("Invalid credentials");
+    }
+
+    // Check password
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      return res.status(401).send("Invalid credentials");
+    }
+
+    // Login successful — save session
+    req.session.userId = user._id;
+    req.session.fullname = user.fullname;
+
+    res.redirect('/'); // Redirect to home or dashboard
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Server error");
+  }
+});
+
+
 
 // ---------------------
 // Custom Product Requests
