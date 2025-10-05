@@ -9,6 +9,7 @@ const session = require('express-session');
 const passport = require('passport');
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const nodemailer = require('nodemailer');
+const router = express.Router();
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -203,43 +204,6 @@ const GUserSchema = new mongoose.Schema({
 });
 const GUser = mongoose.model("UserAuth", GUserSchema);
 
-// Google Strategy
-passport.use(new GoogleStrategy({
-    clientID: process.env.GOOGLE_CLIENT_ID,
-    clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-    callbackURL: process.env.GOOGLE_CALLBACK
-  },
-  async (accessToken, refreshToken, profile, done) => {
-    try {
-      let user = await GUser.findOne({ googleId: profile.id });
-      if (!user) {
-        user = await GUser.create({
-          googleId: profile.id,
-          name: profile.displayName,
-          email: profile.emails[0].value,
-          picture: profile.photos[0].value
-        });
-      }
-      return done(null, user);
-    } catch (err) {
-      return done(err, null);
-    }
-  }
-));
-
-passport.serializeUser((user, done) => done(null, user.id));
-passport.deserializeUser((id, done) => {
-  GUser.findById(id).then(user => done(null, user)).catch(err => done(err, null));
-});
-
-// Google OAuth Routes
-app.get("/auth/google", passport.authenticate("google", { scope: ["profile", "email"] }));
-
-app.get("/auth/google/callback",
-  passport.authenticate("google", { failureRedirect: "/login" }),
-  (req, res) => res.redirect("/")
-);
-
 // Logout
 app.get("/logout", (req, res, next) => {
   req.logout(err => {
@@ -412,6 +376,54 @@ app.delete("/api/users/:id", async (req, res) => {
     res.status(500).json({ message: "Error deleting user" });
   }
 });
+// routes/adminRoutes.js
+
+
+// Get all users
+router.get('/api/users', async (req, res) => {
+  try {
+    const users = await User.find().sort({ createdAt: -1 });
+    res.json(users);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+// Delete user
+router.delete('/api/users/:id', async (req, res) => {
+  try {
+    await User.findByIdAndDelete(req.params.id);
+    res.json({ message: 'User deleted successfully' });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+module.exports = router;
+// Update user info
+router.put('/api/users/:id', async (req, res) => {
+  try {
+    const { fullname, email, username, role, isActive } = req.body;
+    const user = await User.findById(req.params.id);
+    if(!user) return res.status(404).json({ message: 'User not found' });
+
+    user.fullname = fullname;
+    user.email = email;
+    user.username = username;
+    user.role = role;
+    user.isActive = isActive;
+
+    await user.save();
+    res.json({ message: 'User updated successfully' });
+  } catch(err) {
+    console.error(err);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+
 
 // ---------------------
 // Start Server
