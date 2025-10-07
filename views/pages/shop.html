@@ -11,9 +11,6 @@
   <!-- Font Awesome -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-  <!-- Bootstrap Icons -->
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
-
   <!-- Google Font -->
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
 
@@ -28,11 +25,11 @@
     .product-card img { width:100%; height:200px; object-fit:cover; }
     .product-info p { margin:0; color:#666; font-size:0.9rem; }
     .product-info h6 { margin:5px 0; font-weight:600; font-size:1rem; }
-    .product-info .price { font-weight:600; color:#ff6f61; margin-right:5px; }
-    .product-info .old-price { text-decoration:line-through; color:#999; font-size:0.85rem; }
-    .stock-info { font-size:0.8rem; color:#888; margin-top:5px; }
+    .product-info .price { font-weight:600; color:#ff6f61; }
+  </style>
 
-    /* Cart Sidebar */
+  <!-- CART SIDEBAR STYLES -->
+  <style>
     .cart-sidebar {
       position: fixed;
       top: 0;
@@ -55,11 +52,22 @@
       padding: 16px;
       border-bottom: 1px solid #e9e9e9;
     }
-    .cart-body { flex: 1; overflow-y: auto; padding: 14px; }
-    .cart-item { display: flex; justify-content: space-between; gap: 12px; align-items: center; padding: 10px 0; border-bottom: 1px solid #f1f1f1; }
+    .cart-body {
+      flex: 1;
+      overflow-y: auto;
+      padding: 14px;
+    }
+    .cart-item {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: center;
+      padding: 10px 0;
+      border-bottom: 1px solid #f1f1f1;
+    }
+    .cart-item span { display: block; max-width: 70%; word-break: break-word; }
     .cart-footer { padding: 14px; border-top: 1px solid #e9e9e9; }
 
-    /* Overlay */
     .cart-overlay {
       position: fixed;
       inset: 0;
@@ -69,8 +77,7 @@
     }
     .cart-overlay.active { display: block; }
 
-    /* Cart count badge */
-    .cart-icon { position: relative; display: inline-block; cursor:pointer; }
+    .cart-icon { position: relative; display: inline-block; cursor: pointer; }
     .cart-count {
       display: none;
       position: absolute;
@@ -87,7 +94,9 @@
     }
     .cart-count.show { display: inline-block; }
 
-    @media (max-width: 480px){ .cart-sidebar { width: 92%; } }
+    @media (max-width: 480px) {
+      .cart-sidebar { width: 92%; }
+    }
   </style>
 </head>
 <body class="shop-page">
@@ -106,7 +115,7 @@
       <div class="col-12 col-md-6 d-flex justify-content-center justify-content-md-end flex-wrap align-items-center gap-3">
         <span class="small">Call us: <strong>+91 9921041736</strong></span>
         <a href="#">Orders</a>
-        <a class="cart-icon"><i class="fa fa-shopping-cart"></i><span id="cartCount" class="cart-count">0</span></a>
+        <a class="cart-icon"><i class="fa fa-shopping-cart"></i></a>
       </div>
     </div>
   </div>
@@ -136,41 +145,97 @@
   <div class="row g-4" id="productContainer"></div>
 </div>
 
-<!-- Cart Sidebar -->
-<div id="cartSidebar" class="cart-sidebar">
+<!-- ✅ CART SIDEBAR -->
+<!-- ✅ CART SIDEBAR -->
+<div id="cartSidebar" class="cart-sidebar" aria-hidden="true">
   <div class="cart-header">
-    <h5>Your Cart</h5>
-    <button class="btn-close" onclick="toggleCartSidebar()"></button>
+    <h5 class="mb-0">Your Cart</h5>
+    <button class="btn-close" id="closeCart" aria-label="Close cart"></button>
   </div>
+  
   <div class="cart-body" id="cartItems">
     <p class="text-muted">Your cart is empty</p>
   </div>
+  
+  <!-- Payment Section (hidden by default) -->
+  <div class="cart-payment" id="cartPayment" style="display: none; text-align: center; padding: 15px;">
+    <h6>Scan QR to Pay</h6>
+    <img src="https://via.placeholder.com/150" alt="QR Code" style="margin-top: 10px;">
+    <p class="text-muted mt-2">Use your app to scan and complete payment</p>
+  </div>
+  
   <div class="cart-footer">
-    <h5>Total: ₹<span id="cartTotal">0</span></h5>
-    <button class="btn btn-success w-100 mb-2" onclick="checkout()">Checkout</button>
-    <button class="btn btn-secondary w-100" onclick="toggleCartSidebar()">Close</button>
+    <button id="checkoutBtn" class="btn btn-dark w-100">Proceed to Payment</button>
   </div>
 </div>
-<div id="cartOverlay" class="cart-overlay" onclick="toggleCartSidebar()"></div>
+<div id="cartOverlay" class="cart-overlay" tabindex="-1"></div>
+
+<script>
+  const checkoutBtn = document.getElementById('checkoutBtn');
+  const cartPayment = document.getElementById('cartPayment');
+
+  checkoutBtn.addEventListener('click', () => {
+    // Replace this with your real login check
+    const isLoggedIn = true; // true = logged in, false = not logged in
+
+    if (!isLoggedIn) {
+      alert('Please log in first to proceed to payment.');
+      window.location.href = '/login'; // redirect to login page
+    } else {
+      // Show payment section with QR code
+      cartPayment.style.display = 'block';
+      // Optionally, scroll to payment section
+      cartPayment.scrollIntoView({ behavior: 'smooth' });
+    }
+  });
+</script>
+<script>
+    async function updateTopBar() {
+      try {
+        const res = await fetch('/api/current_user');
+        const user = await res.json();
+
+        const topBar = document.getElementById('topBarUser');
+        if (user) {
+          topBar.innerHTML = `Welcome, <strong>${user.name}</strong> | <a href="/logout">Log out</a>`;
+        } else {
+          topBar.innerHTML = `Welcome visitor, you can 
+            <a href="/login">Log in</a> or 
+            <a href="/register">Create an Account</a>`;
+        }
+      } catch (err) {
+        console.error('Error fetching user:', err);
+      }
+    }
+
+    // Call it on page load
+    updateTopBar();
+</script>
 
 <!-- Footer -->
-<footer class="artist-footer">
+ <footer class="artist-footer">
   <div class="footer-container">
+    <!-- Brand Section -->
     <div class="footer-section footer-brand">
       <h2 class="footer-logo">🎨 ArtistGrade</h2>
       <p class="footer-tagline">Your one-stop store for premium art supplies & creative tools.</p>
+
       <div class="footer-social">
         <a href="#"><i class="fab fa-facebook-f"></i></a>
         <a href="#"><i class="fab fa-instagram"></i></a>
         <a href="#"><i class="fab fa-twitter"></i></a>
         <a href="#"><i class="fab fa-youtube"></i></a>
       </div>
-      <a href="https://wa.me/919137534732?text=Hello%20ArtistGrade%2C%20I%20saw%20your%20website%20and%20want%20to%20know%20more%20about%20your%20products."
-         target="_blank" class="whatsapp-btn">
-        <i class="fab fa-whatsapp"></i> Chat on WhatsApp
-      </a>
+
+   <a href="https://wa.me/919137534732?text=Hello%20ArtistGrade%2C%20I%20saw%20your%20website%20and%20want%20to%20know%20more%20about%20your%20products."
+   target="_blank" 
+   class="whatsapp-btn">
+    <i class="fab fa-whatsapp"></i> Chat on WhatsApp
+  </a>
+
     </div>
 
+    <!-- Quick Links -->
     <div class="footer-section">
       <h4>Quick Links</h4>
       <ul>
@@ -182,6 +247,7 @@
       </ul>
     </div>
 
+    <!-- Support Links -->
     <div class="footer-section">
       <h4>Support</h4>
       <ul>
@@ -201,138 +267,134 @@
 <!-- Scripts -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-  let cart = JSON.parse(localStorage.getItem('cart')) || [];
-  let productsData = [];
-
-  async function fetchProducts(){
-    try{
+  // Fetch products dynamically
+  async function fetchProducts() {
+    try {
       const res = await fetch('/api/products');
-      if(!res.ok) throw new Error('Failed to fetch products');
-      productsData = await res.json();
+      const products = await res.json();
       const container = document.getElementById("productContainer");
-      container.innerHTML='';
-      productsData.forEach(p=>{
+      container.innerHTML = '';
+      products.forEach(p => {
         const card = document.createElement('div');
-        card.className='col-md-3 col-sm-6';
+        card.className = 'col-md-3 col-sm-6';
         card.innerHTML = `
-          <div class="product-card">
-            <img src="${p.image}" alt="${escapeHtml(p.name)}">
-            <div class="p-3">
-              <p>${escapeHtml(p.category)}</p>
-              <h6>${escapeHtml(p.name)}</h6>
-              <div><span class="price">₹${p.price}</span></div>
-              <button class="btn btn-primary mt-2" onclick="addToCart('${p._id}')">Add to Cart</button>
-            </div>
+          <div class="product-card p-3 text-center">
+            <img src="${p.image}" alt="${p.name}">
+            <h3 class="mt-2">${p.name}</h3>
+            <p>₹${p.price}</p>
+            <button class="btn btn-primary mt-2" onclick="addToCart('${p._id}')">Add to Cart</button>
           </div>`;
         container.appendChild(card);
       });
-      updateCartUI();
-    } catch(err) { console.error(err); }
+    } catch (err) {
+      console.error("Error fetching products:", err);
+    }
   }
+  document.addEventListener("DOMContentLoaded", fetchProducts);
+</script>
 
-  function addToCart(id){
-    const product = productsData.find(p=>p._id===id);
-    if(!product) return;
-    const existing = cart.find(i=>i._id===id);
-    if(existing) existing.qty+=1;
-    else cart.push({...product, qty:1});
-    saveCart();
-    updateCartUI();
-    openCartSidebar();
-  }
+<!-- ✅ CART SIDEBAR SCRIPT -->
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const cartIcon = document.querySelector(".cart-icon");
+    const sidebar = document.getElementById("cartSidebar");
+    const overlay = document.getElementById("cartOverlay");
+    const closeCart = document.getElementById("closeCart");
+    const checkoutBtn = document.getElementById("checkoutBtn");
+    const cartItemsContainer = document.getElementById("cartItems");
 
-  function decreaseQty(id){
-    const item = cart.find(i=>i._id===id);
-    if(!item) return;
-    item.qty -= 1;
-    if(item.qty <= 0) cart = cart.filter(i=>i._id!==id);
-    saveCart();
-    updateCartUI();
-  }
+    const cartCountBadge = document.createElement("span");
+    cartCountBadge.className = "cart-count";
+    cartIcon.appendChild(cartCountBadge);
 
-  function removeFromCart(id){
-    cart = cart.filter(i=>i._id!==id);
-    saveCart();
-    updateCartUI();
-  }
+    function getCart() { return JSON.parse(localStorage.getItem("cart") || "[]"); }
+    function saveCart(cart) { localStorage.setItem("cart", JSON.stringify(cart)); }
 
-  function saveCart(){ localStorage.setItem('cart', JSON.stringify(cart)); }
-
-  function updateCartUI(){
-    const cartCountEl = document.getElementById('cartCount');
-    const cartItemsEl = document.getElementById('cartItems');
-    const cartTotalEl = document.getElementById('cartTotal');
-
-    let total = 0;
-    cartItemsEl.innerHTML = '';
-
-    if(cart.length === 0){
-      cartItemsEl.innerHTML = '<p class="text-muted">Your cart is empty</p>';
-      if(cartCountEl) cartCountEl.classList.remove('show');
-    } else {
-      cart.forEach(item => {
-        total += item.price * item.qty;
-        const div = document.createElement('div');
-        div.className = 'cart-item d-flex justify-content-between align-items-center mb-2';
+    function updateCartUI() {
+      const cart = getCart();
+      if (cart.length === 0) {
+        cartItemsContainer.innerHTML = '<p class="text-muted">Your cart is empty</p>';
+        cartCountBadge.textContent = "";
+        cartCountBadge.classList.remove("show");
+        return;
+      }
+      cartItemsContainer.innerHTML = "";
+      cart.forEach((item, index) => {
+        const div = document.createElement("div");
+        div.className = "cart-item";
         div.innerHTML = `
-          <div class="d-flex align-items-center gap-2">
-            <img src="${item.image}" style="width:50px;height:50px;object-fit:cover;" class="rounded">
-            <div>
-              <strong>${escapeHtml(item.name)}</strong>
-              <div class="text-muted" style="font-size:0.85rem;">₹${item.price} each</div>
-              <div class="d-flex align-items-center mt-1">
-                <button class="btn btn-sm btn-outline-secondary me-1" onclick="decreaseQty('${item._id}')">−</button>
-                <span>${item.qty}</span>
-                <button class="btn btn-sm btn-outline-secondary ms-1" onclick="addToCart('${item._id}')">+</button>
-              </div>
-            </div>
-          </div>
-          <div class="text-end">
-            ₹${item.price*item.qty}
-            <button class="btn btn-sm btn-danger ms-1" onclick="removeFromCart('${item._id}')">×</button>
+          <span>${item.name} - ₹${item.price}</span>
+          <div>
+            <button class="btn btn-sm btn-outline-danger remove-item" data-index="${index}">Remove</button>
           </div>`;
-        cartItemsEl.appendChild(div);
+        cartItemsContainer.appendChild(div);
       });
-      if(cartCountEl) cartCountEl.classList.add('show');
+      cartCountBadge.textContent = cart.length;
+      cartCountBadge.classList.add("show");
+
+      cartItemsContainer.querySelectorAll(".remove-item").forEach(btn => {
+        btn.addEventListener("click", () => {
+          const cart = getCart();
+          cart.splice(parseInt(btn.dataset.index), 1);
+          saveCart(cart);
+          updateCartUI();
+        });
+      });
     }
 
-    cartTotalEl.innerText = total;
-    if(cartCountEl) cartCountEl.innerText = cart.reduce((sum,i)=>sum+i.qty,0);
-  }
+    window.addToCart = (productId) => {
+      const card = document.querySelector(`[onclick="addToCart('${productId}')"]`).closest(".product-card");
+      const name = card.querySelector("h3").textContent.trim();
+      const price = card.querySelector("p").textContent.trim().replace("₹", "");
+      const cart = getCart();
+      cart.push({ name, price });
+      saveCart(cart);
+      updateCartUI();
+      sidebar.classList.add("open");
+      overlay.classList.add("active");
+    };
 
-  function toggleCartSidebar(){
-    document.getElementById('cartSidebar').classList.toggle('open');
-    document.getElementById('cartOverlay').classList.toggle('active');
-  }
-
-  function openCartSidebar(){
-    document.getElementById('cartSidebar').classList.add('open');
-    document.getElementById('cartOverlay').classList.add('active');
-  }
-
-  function checkout(){
-    if(cart.length===0) alert("Your cart is empty!");
-    else window.location.href="/checkout";
-  }
-
-  function escapeHtml(str){
-    if(!str) return '';
-    return String(str).replace(/[&<>"'`=\/]/g,s=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":"&#39;",'/':'&#x2F;','`':'&#x60','=':'&#x3D'}[s]));
-  }
-
-  document.addEventListener("DOMContentLoaded", fetchProducts);
-
-  async function updateTopBar() {
-    try {
-      const res = await fetch('/api/current_user');
-      const user = await res.json();
-      const topBar = document.getElementById('topBarUser');
-      if (user && user.name) {
-        topBar.innerHTML = `Welcome, <strong>${user.name}</strong> | <a href="/logout">Log out</a>`;
+    cartIcon.addEventListener("click", (e) => {
+      e.preventDefault();
+      sidebar.classList.add("open");
+      overlay.classList.add("active");
+    });
+    closeCart.addEventListener("click", () => {
+      sidebar.classList.remove("open");
+      overlay.classList.remove("active");
+    });
+    overlay.addEventListener("click", () => {
+      sidebar.classList.remove("open");
+      overlay.classList.remove("active");
+    });
+    checkoutBtn.addEventListener("click", async () => {
+      const cart = getCart();
+      if (cart.length === 0) {
+        alert("Your cart is empty. Please add items before proceeding to payment.");
+        return;
       }
-    } catch (err) { console.error('Error fetching user:', err); }
-  }
-  updateTopBar();
+
+      try {
+        // Check if user is logged in
+        const res = await fetch('/api/current_user');
+        const user = await res.json();
+
+        if (!user || !user.name) {
+          // Not logged in → redirect to login first
+          alert("Please log in to proceed with payment.");
+          window.location.href = `/login?redirect=/checkout`;
+        } else {
+          // User logged in → go to payment page
+          window.location.href = "/checkout";
+        }
+      } catch (err) {
+        console.error('Error checking login status:', err);
+        alert("Unable to verify login. Please try again.");
+      }
+    });
+
+    updateCartUI();
+  });
 </script>
 
 </body>

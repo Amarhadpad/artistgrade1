@@ -135,6 +135,104 @@ body {
   font-family: 'Poppins', sans-serif;
   background-color: #fdfdfd;
 }
+/* -----------------------------
+   Full-Screen Logo Splash
+-------------------------------*/
+
+/* Preloader full screen */
+#logoSplash {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+  overflow: hidden;
+  background: transparent;
+}
+
+/* Animated dark gradient background */
+.background-animation {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(45deg, #0d0d0d, #1a1a2e, #2e1a47, #1a1a2e);
+  background-size: 400% 400%;
+  animation: gradientMove 12s ease infinite;
+  z-index: 1;
+  opacity: 1;
+  transition: opacity 1.5s ease; /* smooth fade */
+}
+
+/* Gradient movement animation */
+@keyframes gradientMove {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* Logo Animation: emerges from background */
+.logo-splash {
+  width: 300px;
+  height: auto;
+  z-index: 2;
+  opacity: 0;
+  transform: scale(0.5) blur(10px);
+  animation: logoEmergence 2s cubic-bezier(0.65, 0, 0.35, 1) forwards;
+  filter: drop-shadow(0 0 40px rgba(255,255,255,0.2));
+  transition: all 1.5s ease; /* smooth fade/shrink */
+}
+
+/* Logo emerges animation keyframes */
+@keyframes logoEmergence {
+  0% {
+    transform: scale(0.5) translateY(0) blur(10px);
+    opacity: 0;
+  }
+  40% {
+    transform: scale(1.2) translateY(-30px) blur(3px);
+    opacity: 1;
+  }
+  70% {
+    transform: scale(0.8) translateY(-10px) blur(0);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(0.6) translateY(-20px) blur(0);
+    opacity: 1;
+  }
+}
+
+/* Fade out splash smoothly */
+body.loaded #logoSplash {
+  pointer-events: none;
+}
+
+/* Fade out background and logo smoothly */
+body.loaded .background-animation {
+  opacity: 0;
+}
+
+body.loaded .logo-splash {
+  opacity: 0;
+  transform: scale(0.3) translateY(-50px); /* shrink while fading */
+}
+
+/* Optional: floating blurred shapes for ambient effect */
+.floating-shape {
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.05);
+  filter: blur(100px);
+  width: 200px;
+  height: 200px;
+  animation: float 6s ease-in-out infinite;
+  z-index: 1;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0) translateX(0); }
+  50% { transform: translateY(-50px) translateX(30px); }
+}
 
 /* Hero Section */
 .hero {

@@ -211,14 +211,14 @@ app.get("/logout", (req, res, next) => {
     res.redirect("/");
   });
 });
-
-//login user
+//current user
 app.get('/api/current_user', (req, res) => {
   if (req.session.userId) {
-    return res.json({ name: req.session.fullname}); // or store user name in session
+    return res.json({ name: req.session.fullname || "User" }); 
   }
   res.json(null);
 });
+
 
 app.post('/login', async (req, res) => {
   try {
@@ -423,6 +423,16 @@ router.put('/api/users/:id', async (req, res) => {
   }
 });
 
+// Serve the checkout page
+app.get('/checkout', (req, res) => {
+  // Check if user is logged in
+  if (!req.user) {
+    // If not logged in, redirect to login
+    return res.redirect('/login?redirect=/checkout');
+  }
+  // Render your checkout page (HTML file or template)
+  res.sendFile(path.join(__dirname, 'public', 'checkout.html')); // adjust path
+});
 
 
 // ---------------------

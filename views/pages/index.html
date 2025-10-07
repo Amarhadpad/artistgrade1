@@ -174,7 +174,13 @@
       .cart-sidebar { width: 92%; }
     }
   </style>
-</head>
+
+<!-- Full-page Logo Preloader -->
+<div id="logoSplash">
+  <div class="background-animation"></div> <!-- animated background -->
+  <img src="/public/images/car1.jpg" alt="ArtistGrade Logo" class="logo-splash">
+</div>
+
 
 <!-- header.html -->
 <div class="fixed-header">
@@ -197,6 +203,69 @@
     </div>
   </div>
 </div>
+<script>
+let isLoggedIn = false; // global login flag
+
+// Function to check current user session
+async function checkUserLogin() {
+  try {
+    const res = await fetch('/api/current_user', {
+      method: 'GET',
+      credentials: 'include'
+    });
+    const user = await res.json();
+
+    const topBar = document.getElementById("topBarUser");
+
+    if (user && user.name) {
+      // ✅ User logged in
+      isLoggedIn = true;
+      topBar.innerHTML = `
+        Welcome, <strong>${user.name}</strong> |
+        <a href="/logout">Logout</a>
+      `;
+      console.log("✅ Logged in as:", user.name);
+    } else {
+      // ❌ Not logged in
+      isLoggedIn = false;
+      topBar.innerHTML = `
+        Welcome visitor, you can 
+        <a href="/login">Log in</a> or 
+        <a href="/register">Create an Account</a>
+      `;
+    }
+  } catch (err) {
+    console.error("Error checking user login:", err);
+  }
+}
+
+// Run check on every page load
+window.addEventListener("DOMContentLoaded", checkUserLogin);
+
+
+// 🛒 Proceed to Payment logic
+const checkoutBtn = document.getElementById("checkoutBtn");
+
+if (checkoutBtn) {
+  checkoutBtn.addEventListener("click", () => {
+    const cart = getCart(); // your existing cart function
+
+    if (!cart || cart.length === 0) {
+      alert("Your cart is empty!");
+      return;
+    }
+
+    if (!isLoggedIn) {
+      alert("Please log in to proceed to payment.");
+      window.location.href = `/login?redirect=/checkout`;
+    } else {
+      console.log("Proceeding to payment...");
+      window.location.href = "/checkout";
+    }
+  });
+}
+</script>
+
 
   <!-- Navbar -->
   <nav class="navbar navbar-expand-lg main-nav">
@@ -309,7 +378,7 @@
   </div>
 </section>
 
-   <!-- Footer -->
+<!-- Footer -->
  <footer class="artist-footer">
   <div class="footer-container">
     <!-- Brand Section -->
@@ -327,8 +396,8 @@
    <a href="https://wa.me/919137534732?text=Hello%20ArtistGrade%2C%20I%20saw%20your%20website%20and%20want%20to%20know%20more%20about%20your%20products."
    target="_blank" 
    class="whatsapp-btn">
-  <i class="fab fa-whatsapp"></i> Chat on WhatsApp
-</a>
+    <i class="fab fa-whatsapp"></i> Chat on WhatsApp
+  </a>
 
     </div>
 
@@ -497,15 +566,32 @@
       overlay.classList.remove("active");
     });
 
-    // ---------- CHECKOUT ----------
-    checkoutBtn.addEventListener("click", () => {
-      const cart = getCart();
-      if (cart.length === 0) {
-        alert("Your cart is empty. Please add items before proceeding to payment.");
-      } else {
-        window.location.href = "/checkout";
-      }
+    checkoutBtn.addEventListener("click", async () => {
+  const cart = getCart();
+  if (cart.length === 0) {
+    alert("Your cart is empty. Please add items before proceeding to payment.");
+    return;
+  }
+
+  try {
+    const res = await fetch('/api/current_user', {
+      method: 'GET',
+      credentials: 'include'
     });
+    const user = await res.json();
+
+    if (!user || !user.name) {
+      alert("Please log in to proceed to payment.");
+      window.location.href = `/login?redirect=/checkout`;
+    } else {
+      console.log("✅ Logged in user:", user.name);
+      window.location.href = "/checkout"; 
+    }
+  } catch (err) {
+    console.error("Error checking user login:", err);
+    window.location.href = `/login?redirect=/checkout`;
+  }
+});
 
     // ---------- INITIALIZE ----------
     updateCartUI();
@@ -553,6 +639,17 @@
   }
 
   document.addEventListener("DOMContentLoaded", loadBestSellers);
+</script>
+<script>
+  const splash = document.getElementById("logoSplash");
+  const logo = document.querySelector(".logo-splash");
+
+  logo.addEventListener("animationend", () => {
+    document.body.classList.add("loaded"); // triggers fade out
+    setTimeout(() => {
+      splash.style.display = "none";
+    }, 500);
+  });
 </script>
 
 
