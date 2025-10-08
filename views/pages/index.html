@@ -21,6 +21,47 @@
   <link rel="stylesheet" href="/public/css/style.css">
   <link rel="stylesheet" href="/public/js/s">
   <link rel="stylesheet" href="/public/css/nav.css">
+<style>
+/* Full-page Lightbox */
+#imageLightbox {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.85);
+  display: none; /* hidden by default */
+  justify-content: center;
+  align-items: center;
+  z-index: 3000;
+  cursor: zoom-out;
+  overflow: auto; /* allows scrolling for very large images */
+}
+
+#imageLightbox img {
+  max-width: 95%;       /* fit almost full width */
+  max-height: 95%;      /* fit almost full height */
+  object-fit: contain;  /* maintain aspect ratio */
+  border-radius: 10px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+  transition: transform 0.3s ease;
+}
+
+#imageLightbox.show img {
+  transform: scale(1.05); /* subtle zoom-in effect */
+}
+
+#closeLightbox {
+  position: absolute;
+  top: 20px;
+  right: 30px;
+  font-size: 2rem;
+  color: #fff;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+</style>
 
 <style>
   /* Product Cards */
@@ -302,11 +343,10 @@ if (checkoutBtn) {
   <div class="container position-relative">
     <h2 class="section-title text-center mb-4">BEST SELLERS</h2>
 
-    <div id="bestSellersCarousel" class="carousel slide" data-bs-ride="carousel" data-bs-wrap="true">
-      <div class="carousel-inner" id="bestSellersInner">
-        <!-- Dynamic slides will be injected here -->
-      </div>
-
+<div id="bestSellersCarousel" class="carousel slide" data-bs-ride="carousel" data-bs-wrap="true">
+  <div class="carousel-inner" id="bestSellersInner">
+    <!-- Dynamic slides will be injected here -->
+  </div>
       <!-- Carousel Controls -->
       <button class="carousel-control-prev unique-prev" type="button" data-bs-target="#bestSellersCarousel" data-bs-slide="prev">
         <i class="bi bi-chevron-left"></i>
@@ -314,8 +354,7 @@ if (checkoutBtn) {
       <button class="carousel-control-next unique-next" type="button" data-bs-target="#bestSellersCarousel" data-bs-slide="next">
         <i class="bi bi-chevron-right"></i>
       </button>
-    </div>
-  </div>
+</div>
 </section>
   
 <!-- Features Section -->
@@ -652,6 +691,79 @@ if (checkoutBtn) {
   });
 </script>
 
+<div id="imageLightbox">
+  <span id="closeLightbox">&times;</span>
+  <img id="lightboxImg" src="">
+</div>
+<script>
+  const BEST_SELLERS_API = "/api/products?bestSellers=true";
+  const lightbox = document.getElementById("imageLightbox");
+  const lightboxImg = document.getElementById("lightboxImg");
+
+  // ---------- LIGHTBOX ----------
+  function openLightbox(src) {
+    lightboxImg.src = src;
+    lightbox.style.display = "flex";
+    lightbox.classList.add("show");
+  }
+
+  function closeLightbox() {
+    lightbox.style.display = "none";
+    lightbox.classList.remove("show");
+  }
+
+  lightbox.addEventListener("click", (e) => {
+    if (e.target === lightbox) closeLightbox();
+  });
+
+  document.getElementById("closeLightbox").addEventListener("click", closeLightbox);
+
+  // ---------- LOAD BEST SELLERS ----------
+  async function loadBestSellers() {
+    try {
+      const res = await fetch(BEST_SELLERS_API);
+      if (!res.ok) throw new Error("Failed to fetch best sellers");
+      const products = await res.json();
+
+      const inner = document.getElementById("bestSellersInner");
+      inner.innerHTML = "";
+
+      for (let i = 0; i < products.length; i += 4) {
+        const slideDiv = document.createElement("div");
+        slideDiv.className = `carousel-item ${i === 0 ? "active" : ""}`;
+
+        let rowHTML = '<div class="row g-3 justify-content-center">';
+        products.slice(i, i + 4).forEach(p => {
+          rowHTML += `
+            <div class="col-12 col-md-6 col-lg-3">
+              <div class="product-card text-center">
+                <img src="${p.image}" class="d-block w-100 carousel-img" alt="${p.name}" style="cursor:pointer;">
+                <h3>${p.name}</h3>
+                <p>₹${p.price}</p>
+                <button class="btn btn-dark" onclick="addToCart('${p._id}')">Add to Cart</button>
+              </div>
+            </div>`;
+        });
+        rowHTML += "</div>";
+        slideDiv.innerHTML = rowHTML;
+        inner.appendChild(slideDiv);
+      }
+
+      // ---------- ATTACH LIGHTBOX CLICK ----------
+      inner.querySelectorAll("img.carousel-img").forEach(img => {
+        img.addEventListener("click", () => openLightbox(img.src));
+      });
+
+    } catch (err) {
+      console.error(err);
+      document.getElementById("bestSellersInner").innerHTML =
+        '<p class="text-center">Failed to load products.</p>';
+    }
+  }
+
+  // ---------- DOM READY ----------
+  document.addEventListener("DOMContentLoaded", loadBestSellers);
+</script>
 
 </body>
 </html>

@@ -17,6 +17,40 @@
   <!-- Global Styles -->
   <link rel="stylesheet" href="../public/css/style.css">
   <link rel="stylesheet" href="../public/css/nav.css">
+  <style>
+.image-lightbox {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.85);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 3000;
+  cursor: zoom-out;
+}
+
+.image-lightbox img {
+  max-width: 90%;
+  max-height: 90%;
+  border-radius: 10px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+  transition: transform 0.3s ease;
+}
+
+.close-lightbox {
+  position: absolute;
+  top: 20px;
+  right: 30px;
+  font-size: 2rem;
+  color: #fff;
+  cursor: pointer;
+  font-weight: bold;
+}
+</style>
+
 
   <style>
     body { font-family: 'Poppins', sans-serif; background:#f9f9f9; }
@@ -145,7 +179,7 @@
   <div class="row g-4" id="productContainer"></div>
 </div>
 
-<!-- ✅ CART SIDEBAR -->
+
 <!-- ✅ CART SIDEBAR -->
 <div id="cartSidebar" class="cart-sidebar" aria-hidden="true">
   <div class="cart-header">
@@ -267,7 +301,32 @@
 <!-- Scripts -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 <script>
+
   // Fetch products dynamically
+      document.addEventListener("DOMContentLoaded", () => {
+      const lightbox = document.getElementById("imageLightbox");
+      const lightboxImg = document.getElementById("lightboxImg");
+      const closeLightbox = document.getElementById("closeLightbox");
+
+      // Event delegation: click on product images
+      document.getElementById("productContainer").addEventListener("click", (e) => {
+        if (e.target.tagName === "IMG") {
+          lightboxImg.src = e.target.src;
+          lightbox.style.display = "flex";
+        }
+      });
+
+      // Close lightbox
+      closeLightbox.addEventListener("click", () => {
+        lightbox.style.display = "none";
+      });
+
+      // Close on click outside image
+      lightbox.addEventListener("click", (e) => {
+        if (e.target === lightbox) lightbox.style.display = "none";
+      });
+    });
+
   async function fetchProducts() {
     try {
       const res = await fetch('/api/products');
@@ -396,6 +455,12 @@
     updateCartUI();
   });
 </script>
+<!-- Product Image Lightbox -->
+<div id="imageLightbox" class="image-lightbox" style="display:none;">
+  <span id="closeLightbox" class="close-lightbox">&times;</span>
+  <img id="lightboxImg" src="" alt="Product Image">
+</div>
+
 
 </body>
 </html>

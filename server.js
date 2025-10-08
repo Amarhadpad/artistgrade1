@@ -79,7 +79,7 @@ const upload = multer({ storage });
 // ---------------------
 // FRONTEND ROUTES
 // ---------------------
-const pages = ['index', 'about', 'contactus', 'login', 'shop', 'product_details', 'register'];
+const pages = ['index', 'about', 'contactus', 'login', 'shop', 'product_details', 'register' ,'checkout'];
 pages.forEach(page => {
   app.get(`/${page === 'index' ? '' : page}`, (req, res) => {
     res.sendFile(path.join(__dirname, `views/pages/${page}.html`));
@@ -190,6 +190,43 @@ app.delete('/api/products/:id', async (req, res) => {
   } catch (err) {
     console.error('Error deleting product:', err);
     res.status(500).json({ message: 'Server error' });
+  }
+});
+
+// Update product
+app.put('/api/products/:id', upload.single('image'), async (req, res) => {
+  try {
+    const { name, category, price, stock } = req.body;
+
+    // Find product by ID
+    const product = await Product.findById(req.params.id);
+    if (!product) {
+      return res.status(404).json({ message: 'Product not found' });
+    }
+
+    // Handle new image upload
+    if (req.file) {
+      // Delete old image if exists
+      if (product.image) {
+        const oldPath = path.join(__dirname, product.image);
+        if (fs.existsSync(oldPath)) fs.unlinkSync(oldPath);
+      }
+      product.image = `/uploads/${req.file.filename}`;
+    }
+
+    // Update fields
+    product.name = name || product.name;
+    product.category = category || product.category;
+    product.price = price ? Number(price) : product.price;
+    product.stock = stock ? Number(stock) : product.stock;
+
+    // Save updated product
+    const updated = await product.save();
+    res.json({ message: 'Product updated successfully', product: updated });
+
+  } catch (err) {
+    console.error('Error updating product:', err);
+    res.status(500).json({ message: 'Server error while updating product' });
   }
 });
 
@@ -386,6 +423,33 @@ app.delete("/api/users/:id", async (req, res) => {
     res.status(500).json({ message: "Error deleting user" });
   }
 });
+// Update user details
+app.put("/api/users/:id", async (req, res) => {
+  try {
+    const { fullname, email, username, role, isActive } = req.body;
+
+    const updatedUser = await UserReg.findByIdAndUpdate(
+      req.params.id,
+      {
+        fullname,
+        email,
+        username,
+        role,
+        isActive: isActive === "true", // Convert string to boolean
+      },
+      { new: true }
+    );
+
+    if (!updatedUser)
+      return res.status(404).json({ message: "User not found" });
+
+    res.json({ message: "User updated successfully", user: updatedUser });
+  } catch (err) {
+    console.error("Error updating user:", err);
+    res.status(500).json({ message: "Error updating user" });
+  }
+});
+
 // routes/adminRoutes.js
 
 
@@ -433,15 +497,77 @@ router.put('/api/users/:id', async (req, res) => {
   }
 });
 
-// Serve the checkout page
-app.get('/checkout', (req, res) => {
-  // Check if user is logged in
-  if (!req.user) {
-    // If not logged in, redirect to login
-    return res.redirect('/login?redirect=/checkout');
-  }
-  // Render your checkout page (HTML file or template)
-  res.sendFile(path.join(__dirname, 'public', 'checkout.html')); // adjust path
+const orderSchema = new mongoose.Schema({
+    orderId: { type: String, unique: true },
+    fullName: { type: String, required: true },
+    email: { type: String, required: true },
+    phone: { type: String, required: true },
+    address: { type: String, required: true },
+    city: { type: String, required: true },
+    state: { type: String, required: true },
+    zip: { type: String, required: true },
+    transactionId: { type: String, required: true },
+    cartItems: [
+        {
+            name: String,
+            price: Number,
+            quantity: Number
+        }
+    ],
+    totalAmount: { type: Number, required: true },
+    status: { type: String, enum: ['Pending', 'Completed', 'Canceled'], default: 'Pending' },
+    date: { type: Date, default: Date.now } 
+});
+
+
+// Get all orders
+app.get('/api/orders', async (req, res) => {
+    try {
+        const orders = await Order.find().sort({ date: -1 });
+        res.json(orders);
+    } catch(err) {
+        res.status(500).json({ message: err.message });
+    }
+});
+
+// Get single order by ID
+app.get('/api/orders/:id', async (req, res) => {
+    try {
+        const order = await Order.findById(req.params.id);
+        if(!order) return res.status(404).json({ message: 'Order not found' });
+        res.json(order);
+    } catch(err) {
+        res.status(500).json({ message: err.message });
+    }
+});
+
+// Delete order by ID
+app.delete('/api/orders/:id', async (req, res) => {
+    try {
+        const order = await Order.findByIdAndDelete(req.params.id);
+        if(!order) return res.status(404).json({ message: 'Order not found' });
+        res.json({ message: 'Order deleted' });
+    } catch(err) {
+        res.status(500).json({ message: err.message });
+    }
+});
+
+app.post('/api/orders', async (req, res) => {
+    try {
+        const count = await Order.countDocuments(); // Get total orders
+        const orderId = `ORD${(count + 1).toString().padStart(3, '0')}`; // e.g., ORD001
+
+        const newOrder = new Order({
+            orderId,
+            ...req.body
+        });
+
+        await newOrder.save();
+        res.status(201).json({ message: 'Order saved successfully!', orderId });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: 'Failed to save order' });
+    }
 });
 
 
