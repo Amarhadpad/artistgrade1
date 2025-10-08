@@ -13,6 +13,16 @@ const router = express.Router();
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+const cloudinary = require('cloudinary').v2;
+
+cloudinary.config({
+  cloud_name: process.env.CLOUD_NAME, // Your cloud name
+  api_key: process.env.CLOUD_API_KEY, // Your API key
+  api_secret: process.env.CLOUD_API_SECRET, // Your API secret
+});
+
+module.exports = cloudinary;
+
 
 // ---------------------
 // Ensure uploads dir exists
